@@ -29,3 +29,6 @@ terraform.rc
 # Editor and OS noise
 .vscode/
 .DS_Store
+# Windows folder metadata
+desktop.ini
+Thumbs.db
