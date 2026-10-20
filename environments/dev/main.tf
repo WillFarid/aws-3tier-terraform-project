@@ -54,3 +54,19 @@ module "alb" {
   logs_force_destroy         = true
 }
 
+module "compute" {
+  source = "../../modules/compute"
+
+  name               = local.name
+  private_subnet_ids = module.vpc.private_subnet_ids
+  app_sg_id          = module.security_groups.app_sg_id
+  target_group_arn   = module.alb.target_group_arn # ASG registers instances here
+
+  app_port = 8080 # must match the SG and ALB modules
+
+  # Dev is small and cheap. Prod will use larger values.
+  instance_type    = "t3.micro"
+  min_size         = 2
+  max_size         = 4
+  desired_capacity = 2
+}
