@@ -33,3 +33,24 @@ module "security_groups" {
   db_port  = 5432 # PostgreSQL, which we'll use for RDS
 }
 
+module "alb" {
+  source = "../../modules/alb"
+
+  name              = local.name
+  vpc_id            = module.vpc.vpc_id
+  public_subnet_ids = module.vpc.public_subnet_ids
+  alb_sg_id         = module.security_groups.alb_sg_id # chained from Step 3
+
+  app_port = 8080 # must match the security_groups module
+
+  # PLACEHOLDER: a real ACM certificate is needed to actually apply this.
+  certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/00000000-0000-0000-0000-000000000000"
+
+  # Must be globally unique in real life; change it if you ever deploy.
+  access_logs_bucket_name = "3tier-dev-alb-logs-replace-me"
+
+  # Dev is disposable: allow easy cleanup. Prod will flip both of these.
+  enable_deletion_protection = false
+  logs_force_destroy         = true
+}
+
