@@ -70,3 +70,45 @@ module "compute" {
   max_size         = 4
   desired_capacity = 2
 }
+
+module "rds" {
+  source = "../../modules/rds"
+
+  name                = local.name
+  database_subnet_ids = module.vpc.database_subnet_ids
+  db_sg_id            = module.security_groups.db_sg_id # chained from Step 3
+
+  instance_class = "db.t4g.micro"
+
+  # Dev is cheap and disposable. Prod will flip all four of these.
+  multi_az                     = false
+  deletion_protection          = false
+  skip_final_snapshot          = true
+  performance_insights_enabled = false # not available on every micro class
+}
+
+# -----------------------------------------------------------------------------
+# Least privilege: the app may read ONE secret and use ONE key. Nothing else.
+# Lives here (not in a module) because it connects two modules: compute and rds.
+# -----------------------------------------------------------------------------
+data "aws_iam_policy_document" "app_read_db_secret" {
+  statement {
+    sid       = "ReadDatabaseSecret"
+    effect    = "Allow"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = [module.rds.master_secret_arn]
+  }
+
+  statement {
+    sid       = "DecryptWithDatabaseKey"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = [module.rds.kms_key_arn]
+  }
+}
+
+resource "aws_iam_role_policy" "app_read_db_secret" {
+  name   = "read-db-secret"
+  role   = module.compute.app_role_name
+  policy = data.aws_iam_policy_document.app_read_db_secret.json
+}
