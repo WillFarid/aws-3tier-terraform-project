@@ -23,7 +23,6 @@ module "vpc" {
   # Prod: one NAT gateway per AZ, so losing an AZ does not cut the other one off.
   single_nat_gateway = false
 
-  flow_log_retention_days = 90
 }
 
 module "security_groups" {

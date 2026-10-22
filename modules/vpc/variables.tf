@@ -52,7 +52,7 @@ variable "single_nat_gateway" {
 variable "flow_log_retention_days" {
   description = "How long to keep VPC flow logs in CloudWatch."
   type        = number
-  default     = 30
+  default     = 365
 }
 
 variable "tags" {

@@ -7,6 +7,7 @@
 # Encryption key (customer-managed)
 # =============================================================================
 resource "aws_kms_key" "rds" {
+  # checkov:skip=CKV2_AWS_64 The AWS default key policy is used, an explicit policy needs the account ID which cannot be looked up offline
   description             = "${var.name} RDS encryption key"
   enable_key_rotation     = true # AWS rotates the key material yearly
   deletion_window_in_days = 30   # safety net: a deleted key can be recovered for 30 days
@@ -88,6 +89,9 @@ resource "aws_iam_role_policy_attachment" "monitoring" {
 # The database
 # =============================================================================
 resource "aws_db_instance" "this" {
+  # checkov:skip=CKV_AWS_293: Deletion protection is a variable, off in dev, on in prod
+  # checkov:skip=CKV_AWS_353: Performance Insights is a variable, off in dev (micro class), on in prod
+  # checkov:skip=CKV_AWS_157: Multi-AZ is a variable, off in dev to save cost, on in prod
   identifier = "${var.name}-postgres"
 
   engine         = "postgres"

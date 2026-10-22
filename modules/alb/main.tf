@@ -7,6 +7,10 @@
 # Access logs bucket
 # =============================================================================
 resource "aws_s3_bucket" "alb_logs" {
+  # checkov:skip=CKV_AWS_145 ALB access log delivery supports SSE-S3 only, not KMS keys
+  # checkov:skip=CKV_AWS_144 Cross-region replication is not justified for disposable access logs
+  # checkov:skip=CKV_AWS_18 This bucket is itself the logging destination
+  # checkov:skip=CKV2_AWS_62 Event notifications are not needed for a log archive
   bucket        = var.access_logs_bucket_name
   force_destroy = var.logs_force_destroy
 
@@ -119,6 +123,8 @@ resource "aws_s3_bucket_policy" "alb_logs" {
 # The load balancer
 # =============================================================================
 resource "aws_lb" "this" {
+  # checkov:skip=CKV2_AWS_28 AWS WAF is a production hardening step listed in the README, not part of this baseline
+  # checkov:skip=CKV_AWS_150: Deletion protection is a variable, off in dev, on in prod
   name               = "${var.name}-alb"
   load_balancer_type = "application"
   internal           = false # internet-facing

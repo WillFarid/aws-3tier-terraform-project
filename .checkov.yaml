@@ -1,0 +1,14 @@
+# Checkov settings, picked up automatically from the repo root.
+framework:
+  - terraform
+
+# Dev is intentionally cost-optimized (no Multi-AZ, no deletion protection,
+# no Performance Insights). Prod is the hardened reference and is fully scanned.
+skip-path:
+  - environments/dev
+
+# Security groups are defined in the security-groups module but attached to
+# resources in the alb, compute and rds modules. Checkov analyzes each module
+# separately, so it cannot see the attachment (false positive).
+skip-check:
+  - CKV2_AWS_5

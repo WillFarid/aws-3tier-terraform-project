@@ -166,6 +166,7 @@ resource "aws_route_table_association" "database" {
 # Records every accepted/rejected connection: essential for security and debugging.
 
 resource "aws_cloudwatch_log_group" "flow_logs" {
+  # checkov:skip=CKV_AWS_158 A KMS key policy needs the account ID, which cannot be looked up offline, add a customer-managed key for a real deployment
   name              = "/aws/vpc/${var.name}/flow-logs"
   retention_in_days = var.flow_log_retention_days
 

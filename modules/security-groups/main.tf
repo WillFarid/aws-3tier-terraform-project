@@ -10,6 +10,7 @@
 # ALB security group (public tier)
 # =============================================================================
 resource "aws_security_group" "alb" {
+  # checkov:skip=CKV2_AWS_5 Attached to the ALB in the alb module, checkov analyzes modules separately
   name        = "${var.name}-alb-sg"
   description = "Load balancer: accepts web traffic from the internet"
   vpc_id      = var.vpc_id
@@ -33,6 +34,7 @@ resource "aws_vpc_security_group_ingress_rule" "alb_https" {
 
 # Inbound HTTP, only so the ALB can redirect visitors to HTTPS.
 resource "aws_vpc_security_group_ingress_rule" "alb_http" {
+  # checkov:skip=CKV_AWS_260 Port 80 only serves a 301 redirect to HTTPS, no content is served over HTTP
   security_group_id = aws_security_group.alb.id
   description       = "HTTP from the internet (redirected to HTTPS)"
   ip_protocol       = "tcp"
@@ -56,6 +58,7 @@ resource "aws_vpc_security_group_egress_rule" "alb_to_app" {
 # App security group (private tier)
 # =============================================================================
 resource "aws_security_group" "app" {
+  # checkov:skip=CKV2_AWS_5: Attached to the ASG launch template in the compute module
   name        = "${var.name}-app-sg"
   description = "App servers: accept traffic only from the load balancer"
   vpc_id      = var.vpc_id
@@ -99,6 +102,7 @@ resource "aws_vpc_security_group_egress_rule" "app_to_db" {
 # Database security group (isolated tier)
 # =============================================================================
 resource "aws_security_group" "db" {
+  # checkov:skip=CKV2_AWS_5: Attached to the RDS instance in the rds module
   name        = "${var.name}-db-sg"
   description = "Database: accept traffic only from the app tier"
   vpc_id      = var.vpc_id
