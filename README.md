@@ -2,7 +2,7 @@
 
 A production-style, multi-environment AWS 3-tier architecture written as reusable Terraform modules, with automated quality gates (formatting, linting, security scanning, generated docs).
 
-> This project was built using mock credentials (see [Running it offline](#running-it-offline)). A real deployment needs an ACM certificate and a state bucket (see [Before a real deployment](before-a-real-deployment)).
+> A prod deployment still needs an ACM certificate and a state bucket (see [Before a real deployment](before-a-real-deployment)).
 
 | Environment | `terraform plan` result |
 |---|---|
